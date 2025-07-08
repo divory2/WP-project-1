@@ -34,3 +34,18 @@ body {
     color: aliceblue;
 
 }
+.begin-button-container a{
+    color: white;
+
+}
+.begin-button-container a:hover{
+    background-color: bisque;
+    color: brown;
+}
+.begin-button-container  a:active, a:visited{
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    
+    
+}
