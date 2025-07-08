@@ -1,0 +1,36 @@
+body {
+   
+
+    background-color: aquamarine;
+}
+.homePage-container {
+    display: grid;
+   
+}
+.header-container{
+    display:grid;
+    justify-content: center;
+    vertical-align: bottom;
+
+
+}
+.button-area{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    top: 80%;
+}
+.begin-button-container{
+    background-color: black;
+    padding: 15px 32px;
+   
+    cursor: pointer;
+    display: grid;
+    text-align:center;
+    width: 50px;
+    height: 50px;
+    font-style: italic;
+    color: aliceblue;
+
+}
