@@ -17,3 +17,29 @@ Restart Terminal
 install Laravel installer via composer:
     composer global require laravel/installer
 
+
+Trivia API
+request body should include example:
+https://opentdb.com/api.php?amount=10&category=9&difficulty=medium&type=multiple
+
+
+amount
+category
+difficulty
+type
+
+
+Category Id:    https://opentdb.com/api_category.php
+
+
+How to initialize curl:
+    curl_init()
+
+How to Execute Curl:
+curl_exec()
+
+Decode Json response:
+    json_decode()
+
+close curl:
+curl_close()
