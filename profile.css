@@ -22,8 +22,34 @@ body {
     text-align: left;
     top: 200px;
     border: solid ;
-    padding-left: 10px;
+    
+    
 }
+
 .player-container p{
+    position: relative;
     font-size: 18px;
+    align-items: center;
+    justify-content: center;
+    top: 70px;
+    left: 3px;
+}
+.player-container form{
+    background-color: red;
+   
+    display: grid;
+  
+   
+}
+.player-container form i{
+    text-align: center;
+}
+.player-container form input:nth-child(2){
+    background: red;
+    border: solid brown 6px ;
+}
+
+.player-container form input:nth-child(3){
+    background: red;
+
 }
