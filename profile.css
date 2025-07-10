@@ -57,6 +57,21 @@ body {
 .difficulty-box{
     width: 100px;
 }
+.number-box{
+    background-color: white;
+    width: 100px;
+}
+.type-container{
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    
+}
+.number-of-questions-container{
+    display: flex;
+    flex-direction: column;
+
+}
 .difficulty-container{
     display: flex;
     position: relative;
