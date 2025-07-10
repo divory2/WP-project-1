@@ -15,29 +15,61 @@ body {
 
 }
 .player-container{
-    display: grid;
-    position: relative;
-    width: 300px;
-    height: 300px;
+    display: flex;
+    /* position: relative; */
+    width: 100%;
+    height: 600%;
     text-align: left;
     top: 200px;
+    flex-direction: column;
+    background-color: beige;
     border: solid ;
     
     
 }
 
 .player-container p{
-    position: relative;
+    
     font-size: 18px;
     align-items: center;
     justify-content: center;
-    top: 70px;
-    left: 3px;
+    
+    /* top: 70px;
+    left: 3px; */
+}
+.player-text-box{
+   display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    top: 50%;
+    left: 50px;
+}
+.player-text-box input{
+    width: 200px;
+    border: solid brown;
+    background-color: white;
+}
+.submit-container{
+    display: flex;
+    justify-content: center;
+}
+.submit-container input{
+    width: 100px;
+    height: 50px;
 }
 .player-container form{
+    height: 100%;
     background-color: red;
-   
-    display: grid;
+    
+    display: flex;
+    justify-content: space-between;
+    flex-direction:column;
+    
+    
+    /* vertical-align:middle;
+    justify-content: flex-start; */
+
   
    
 }
