@@ -54,6 +54,15 @@ body {
     display: flex;
     justify-content: center;
 }
+.difficulty-box{
+    width: 100px;
+}
+.difficulty-container{
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    left: 70%;
+}
 .submit-container input{
     width: 100px;
     height: 50px;
