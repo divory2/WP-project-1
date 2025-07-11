@@ -10,7 +10,7 @@
             </div>
             <div class="player-container">
                 
-                <form method="post">
+                <form method="post" action="http://127.0.0.1:8000/">
                     <!-- this is for form fields -->
                      
                      <!-- player textbox below -->
@@ -39,7 +39,7 @@
                          <!-- type container -->
                     <div class="type-container">
                         <p>Chose Question type</p>
-                        <select class="difficulty-box">
+                        <select name="type" class="difficulty-box">
                             <option value="null">anytype</option>
                             <option value="multiple">Multiple choice</option>
                             <option value="boolean">True/False</option>
@@ -49,7 +49,7 @@
                     <!-- Number of questions container -->
                      <div class="number-of-questions-container">
                         <p> Chose The Number Of questions</p>
-                        <input class="number-box" type="number" min="1" max="50">
+                        <input name="amount" class="number-box" type="number" min="1" max="50" >
                      </div>
 
                     </div>
