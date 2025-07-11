@@ -1,257 +1,617 @@
-class JeopardyGame {
-    constructor() {
-        this.players = [];
-        this.currentPlayer = 0;
-        this.questions = [];
-        this.categories = [];
-        this.gameStarted = false;
-        this.answeredQuestions = new Set();
-        
-        this.initializeEventListeners();
+const { useState, useEffect } = React;
+
+// Main App Component
+function App() {
+  const [currentPage, setCurrentPage] = useState('home');
+  const [gameSettings, setGameSettings] = useState(null);
+
+  const navigateTo = (page, settings = null) => {
+    setCurrentPage(page);
+    if (settings) {
+      setGameSettings(settings);
     }
+  };
 
-    initializeEventListeners() {
-        const setupForm = document.getElementById('setup-form');
-        setupForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.startGame();
-        });
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'home':
+        return <Home onStartGame={navigateTo} />;
+      case 'game':
+        return <Game settings={gameSettings} onGameEnd={navigateTo} />;
+      case 'leaderboard':
+        return <Leaderboard onBackToHome={() => navigateTo('home')} />;
+      default:
+        return <Home onStartGame={navigateTo} />;
     }
+  };
 
-    async startGame() {
-        const numPlayers = parseInt(document.getElementById('num-players').value);
-        const difficulty = document.getElementById('difficulty').value;
-        const numQuestions = parseInt(document.getElementById('num-questions').value);
-
-        // Initialize players
-        this.players = [];
-        for (let i = 0; i < numPlayers; i++) {
-            this.players.push({
-                id: i + 1,
-                name: `Player ${i + 1}`,
-                score: 0
-            });
-        }
-
-        try {
-            // Fetch questions from API
-            const response = await fetch(`api.php?difficulty=${difficulty}&count=${numQuestions}`);
-            const data = await response.json();
-            
-            if (data.success) {
-                this.questions = data.questions;
-                this.categories = [...new Set(this.questions.map(q => q.category))];
-                this.displayGameBoard();
-                this.updateScoreBoard();
-                this.gameStarted = true;
-            } else {
-                alert('Error loading questions: ' + data.message);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error loading questions. Please try again.');
-        }
-    }
-
-    displayGameBoard() {
-        document.getElementById('game-setup').style.display = 'none';
-        document.getElementById('game-board').style.display = 'block';
-
-        // Display categories
-        const categoriesDiv = document.getElementById('categories');
-        categoriesDiv.innerHTML = '';
-        this.categories.forEach(category => {
-            const categoryDiv = document.createElement('div');
-            categoryDiv.className = 'category';
-            categoryDiv.textContent = category;
-            categoriesDiv.appendChild(categoryDiv);
-        });
-
-        // Display questions
-        this.displayQuestions();
-    }
-
-    displayQuestions() {
-        const questionsDiv = document.getElementById('questions');
-        questionsDiv.innerHTML = '';
-
-        this.questions.forEach((question, index) => {
-            const questionDiv = document.createElement('div');
-            questionDiv.className = 'question';
-            questionDiv.textContent = `$${question.value}`;
-            questionDiv.dataset.index = index;
-            
-            if (this.answeredQuestions.has(index)) {
-                questionDiv.classList.add('answered');
-            } else {
-                questionDiv.addEventListener('click', () => this.showQuestion(index));
-            }
-            
-            questionsDiv.appendChild(questionDiv);
-        });
-    }
-
-    showQuestion(index) {
-        const question = this.questions[index];
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <h3>${question.category}</h3>
-                <p class="question-text">${question.question}</p>
-                <div class="options">
-                    <button class="option" data-correct="false">${question.incorrect_answers[0]}</button>
-                    <button class="option" data-correct="false">${question.incorrect_answers[1]}</button>
-                    <button class="option" data-correct="false">${question.incorrect_answers[2]}</button>
-                    <button class="option" data-correct="true">${question.correct_answer}</button>
-                </div>
-                <div class="current-player">
-                    Current Player: ${this.players[this.currentPlayer].name}
-                </div>
-            </div>
-        `;
-
-        // Shuffle options
-        const options = modal.querySelectorAll('.option');
-        const optionsArray = Array.from(options);
-        for (let i = optionsArray.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [optionsArray[i], optionsArray[j]] = [optionsArray[j], optionsArray[i]];
-        }
-
-        // Add event listeners to options
-        options.forEach(option => {
-            option.addEventListener('click', () => {
-                this.handleAnswer(index, option.dataset.correct === 'true');
-                document.body.removeChild(modal);
-            });
-        });
-
-        document.body.appendChild(modal);
-    }
-
-    handleAnswer(questionIndex, isCorrect) {
-        const question = this.questions[questionIndex];
-        const player = this.players[this.currentPlayer];
-        
-        if (isCorrect) {
-            player.score += question.value;
-            alert(`${player.name} answered correctly! +$${question.value}`);
-        } else {
-            player.score -= question.value;
-            alert(`${player.name} answered incorrectly! -$${question.value}\nCorrect answer: ${question.correct_answer}`);
-        }
-
-        this.answeredQuestions.add(questionIndex);
-        this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
-        
-        this.updateScoreBoard();
-        this.displayQuestions();
-
-        // Check if game is over
-        if (this.answeredQuestions.size === this.questions.length) {
-            this.endGame();
-        }
-    }
-
-    updateScoreBoard() {
-        const scoresDiv = document.getElementById('scores');
-        scoresDiv.innerHTML = '';
-
-        this.players.forEach((player, index) => {
-            const playerDiv = document.createElement('div');
-            playerDiv.className = 'player-score';
-            if (index === this.currentPlayer && this.gameStarted) {
-                playerDiv.classList.add('active');
-            }
-            playerDiv.innerHTML = `
-                <strong>${player.name}</strong><br>
-                Score: $${player.score}
-            `;
-            scoresDiv.appendChild(playerDiv);
-        });
-    }
-
-    endGame() {
-        const winner = this.players.reduce((prev, current) => 
-            (prev.score > current.score) ? prev : current
-        );
-
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <h2>Game Over!</h2>
-                <p>Winner: ${winner.name} with $${winner.score}</p>
-                <button onclick="location.reload()">Play Again</button>
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-    }
+  return (
+    <div className="App">
+      {renderPage()}
+    </div>
+  );
 }
 
-// Initialize game when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    new JeopardyGame();
-});
+// Home Component
+function Home({ onStartGame }) {
+  const [categories, setCategories] = useState([]);
+  const [difficulties, setDifficulties] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedDifficulty, setSelectedDifficulty] = useState('');
+  const [playerNames, setPlayerNames] = useState(['', '', '']);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-// Add CSS for modal
-const style = document.createElement('style');
-style.textContent = `
-    .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [categoriesRes, difficultiesRes] = await Promise.all([
+          axios.get('api.php?endpoint=categories'),
+          axios.get('api.php?endpoint=difficulties')
+        ]);
+
+        setCategories(categoriesRes.data.trivia_categories || []);
+        setDifficulties(difficultiesRes.data.difficulties || []);
+        
+        // Set defaults
+        if (categoriesRes.data.trivia_categories?.length > 0) {
+          setSelectedCategory(categoriesRes.data.trivia_categories[0].id.toString());
+        }
+        if (difficultiesRes.data.difficulties?.length > 0) {
+          setSelectedDifficulty(difficultiesRes.data.difficulties[0].id);
+        }
+      } catch (err) {
+        setError('Failed to load game settings. Please try again.');
+        console.error('Error fetching data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handlePlayerNameChange = (index, value) => {
+    const newNames = [...playerNames];
+    newNames[index] = value;
+    setPlayerNames(newNames);
+  };
+
+  const handleStartGame = () => {
+    if (!selectedCategory || !selectedDifficulty) {
+      setError('Please select both category and difficulty.');
+      return;
     }
+
+    const validNames = playerNames.filter(name => name.trim() !== '');
+    if (validNames.length < 2) {
+      setError('Please enter at least 2 player names.');
+      return;
+    }
+
+    const settings = {
+      category: selectedCategory,
+      difficulty: selectedDifficulty,
+      playerNames: validNames
+    };
+
+    onStartGame('game', settings);
+  };
+
+  if (loading) {
+    return (
+      <div className="container">
+        <div className="loading">Loading game settings...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container">
+      <div className="card">
+        <h1 style={{ textAlign: 'center', marginBottom: '30px', fontSize: '2.5rem', color: '#333' }}>
+          🎯 Jeopardy Game
+        </h1>
+
+        {error && <div className="error">{error}</div>}
+
+        <div className="form-group">
+          <label htmlFor="category">Select Category:</label>
+          <select
+            id="category"
+            className="form-control"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            {categories.map(category => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="difficulty">Select Difficulty:</label>
+          <select
+            id="difficulty"
+            className="form-control"
+            value={selectedDifficulty}
+            onChange={(e) => setSelectedDifficulty(e.target.value)}
+          >
+            {difficulties.map(difficulty => (
+              <option key={difficulty.id} value={difficulty.id}>
+                {difficulty.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label>Player Names (3 players):</label>
+          {playerNames.map((name, index) => (
+            <input
+              key={index}
+              type="text"
+              className="form-control"
+              placeholder={`Player ${index + 1} Name`}
+              value={name}
+              onChange={(e) => handlePlayerNameChange(index, e.target.value)}
+              style={{ marginBottom: '10px' }}
+            />
+          ))}
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: '30px' }}>
+          <button className="btn" onClick={handleStartGame}>
+            Start Game
+          </button>
+          <button 
+            className="btn btn-secondary" 
+            onClick={() => onStartGame('leaderboard')}
+            style={{ marginLeft: '15px' }}
+          >
+            View Leaderboard
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Game Component
+function Game({ settings, onGameEnd }) {
+  const [questions, setQuestions] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [answeredQuestions, setAnsweredQuestions] = useState(new Set());
+  const [currentPlayer, setCurrentPlayer] = useState(0);
+  const [players, setPlayers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [gameEnded, setGameEnded] = useState(false);
+
+  useEffect(() => {
+    const initializeGame = async () => {
+      try {
+        const response = await axios.get('api.php', {
+          params: {
+            endpoint: 'questions',
+            category: settings.category,
+            difficulty: settings.difficulty,
+            amount: 15 // 5 questions per player
+          }
+        });
+
+        if (response.data.response_code === 0) {
+          setQuestions(response.data.results);
+          
+          // Initialize players
+          const initialPlayers = settings.playerNames.map((name, index) => ({
+            id: index,
+            name: name,
+            score: 0,
+            questionsAnswered: 0
+          }));
+          setPlayers(initialPlayers);
+        } else {
+          setError('Failed to load questions. Please try again.');
+        }
+      } catch (err) {
+        setError('Failed to load questions. Please try again.');
+        console.error('Error fetching questions:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (settings) {
+      initializeGame();
+    }
+  }, [settings]);
+
+  const handleQuestionClick = (questionIndex) => {
+    if (answeredQuestions.has(questionIndex)) return;
     
-    .modal-content {
-        background: white;
-        padding: 30px;
-        border-radius: 10px;
-        max-width: 600px;
-        width: 90%;
-        text-align: center;
-    }
+    const question = questions[questionIndex];
+    setCurrentQuestion({ ...question, index: questionIndex });
+    setSelectedAnswer(null);
+    setShowModal(true);
+  };
+
+  const handleAnswerSelect = (answer) => {
+    setSelectedAnswer(answer);
+  };
+
+  const handleSubmitAnswer = () => {
+    if (!selectedAnswer) return;
+
+    const isCorrect = selectedAnswer === currentQuestion.correct_answer;
+    const points = getPointsForDifficulty(settings.difficulty);
     
-    .question-text {
-        font-size: 18px;
-        margin: 20px 0;
-        line-height: 1.5;
+    // Update player score
+    const updatedPlayers = [...players];
+    if (isCorrect) {
+      updatedPlayers[currentPlayer].score += points;
+    } else {
+      updatedPlayers[currentPlayer].score = Math.max(0, updatedPlayers[currentPlayer].score - points);
     }
+    updatedPlayers[currentPlayer].questionsAnswered += 1;
+    setPlayers(updatedPlayers);
+
+    // Mark question as answered
+    setAnsweredQuestions(prev => new Set([...prev, currentQuestion.index]));
+
+    // Check if game is over
+    const totalAnswered = answeredQuestions.size + 1;
+    if (totalAnswered >= questions.length) {
+      endGame(updatedPlayers);
+      return;
+    }
+
+    // Move to next player
+    setCurrentPlayer((prev) => (prev + 1) % players.length);
+    setShowModal(false);
+  };
+
+  const getPointsForDifficulty = (difficulty) => {
+    switch (difficulty) {
+      case 'easy': return 100;
+      case 'medium': return 200;
+      case 'hard': return 300;
+      default: return 100;
+    }
+  };
+
+  const endGame = (finalPlayers) => {
+    setGameEnded(true);
     
-    .options {
-        display: grid;
-        gap: 10px;
-        margin: 20px 0;
-    }
+    // Save to leaderboard
+    const leaderboard = JSON.parse(localStorage.getItem('jeopardyLeaderboard') || '[]');
+    const gameResult = {
+      date: new Date().toISOString(),
+      category: settings.category,
+      difficulty: settings.difficulty,
+      players: finalPlayers.map(player => ({
+        name: player.name,
+        score: player.score
+      }))
+    };
     
-    .option {
-        padding: 15px;
-        border: 2px solid #ddd;
-        border-radius: 5px;
-        background: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
+    leaderboard.push(gameResult);
+    leaderboard.sort((a, b) => {
+      const aMaxScore = Math.max(...a.players.map(p => p.score));
+      const bMaxScore = Math.max(...b.players.map(p => p.score));
+      return bMaxScore - aMaxScore;
+    });
     
-    .option:hover {
-        background: #667eea;
-        color: white;
-        border-color: #667eea;
-    }
+    // Keep only top 10 games
+    const topLeaderboard = leaderboard.slice(0, 10);
+    localStorage.setItem('jeopardyLeaderboard', JSON.stringify(topLeaderboard));
+  };
+
+  const renderGameBoard = () => {
+    const points = [100, 200, 300, 400, 500];
+    const categories = ['Category 1', 'Category 2', 'Category 3'];
     
-    .current-player {
-        margin-top: 20px;
-        font-weight: bold;
-        color: #667eea;
+    return (
+      <div className="game-board">
+        {points.map((point, rowIndex) => (
+          <React.Fragment key={point}>
+            {categories.map((category, colIndex) => {
+              const questionIndex = rowIndex * 3 + colIndex;
+              const isAnswered = answeredQuestions.has(questionIndex);
+              
+              return (
+                <div
+                  key={`${point}-${category}`}
+                  className={`question-card ${isAnswered ? 'answered' : ''}`}
+                  onClick={() => handleQuestionClick(questionIndex)}
+                >
+                  {isAnswered ? '✓' : `$${point}`}
+                </div>
+              );
+            })}
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  };
+
+  const renderPlayers = () => {
+    return (
+      <div className="players">
+        {players.map((player, index) => (
+          <div
+            key={player.id}
+            className={`player-card ${index === currentPlayer && !gameEnded ? 'active' : ''}`}
+          >
+            <h3>{player.name}</h3>
+            <div className="player-score">${player.score}</div>
+            <div>Questions: {player.questionsAnswered}/5</div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderQuestionModal = () => {
+    if (!currentQuestion) return null;
+
+    const allAnswers = [...currentQuestion.incorrect_answers, currentQuestion.correct_answer];
+    const shuffledAnswers = allAnswers.sort(() => Math.random() - 0.5);
+
+    return (
+      <div className="modal">
+        <div className="modal-content">
+          <h2>Question</h2>
+          <p style={{ marginBottom: '20px', fontSize: '18px' }}>
+            {currentQuestion.question}
+          </p>
+          
+          <div className="answer-options">
+            {shuffledAnswers.map((answer, index) => (
+              <div
+                key={index}
+                className={`answer-option ${selectedAnswer === answer ? 'selected' : ''}`}
+                onClick={() => handleAnswerSelect(answer)}
+              >
+                {answer}
+              </div>
+            ))}
+          </div>
+          
+          <div style={{ textAlign: 'center', marginTop: '20px' }}>
+            <button
+              className="btn"
+              onClick={handleSubmitAnswer}
+              disabled={!selectedAnswer}
+            >
+              Submit Answer
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => setShowModal(false)}
+              style={{ marginLeft: '10px' }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderGameEnd = () => {
+    const winner = players.reduce((prev, current) => 
+      (prev.score > current.score) ? prev : current
+    );
+
+    return (
+      <div className="modal">
+        <div className="modal-content">
+          <h2>Game Over!</h2>
+          <div style={{ textAlign: 'center', margin: '20px 0' }}>
+            <h3>🏆 Winner: {winner.name} 🏆</h3>
+            <p>Final Score: ${winner.score}</p>
+          </div>
+          
+          <div style={{ marginBottom: '20px' }}>
+            <h4>Final Standings:</h4>
+            {players
+              .sort((a, b) => b.score - a.score)
+              .map((player, index) => (
+                <div key={player.id} className="leaderboard-item">
+                  <span className="leaderboard-rank">#{index + 1}</span>
+                  <span>{player.name}</span>
+                  <span className="leaderboard-score">${player.score}</span>
+                </div>
+              ))
+            }
+          </div>
+          
+          <div style={{ textAlign: 'center' }}>
+            <button className="btn" onClick={() => onGameEnd('home')}>
+              Play Again
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => onGameEnd('leaderboard')}
+              style={{ marginLeft: '10px' }}
+            >
+              View Leaderboard
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="container">
+        <div className="loading">Loading game...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container">
+        <div className="card">
+          <div className="error">{error}</div>
+          <button className="btn" onClick={() => onGameEnd('home')}>
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container">
+      <div className="card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h1>🎯 Jeopardy Game</h1>
+          <button className="btn btn-secondary" onClick={() => onGameEnd('home')}>
+            Back to Home
+          </button>
+        </div>
+
+        {renderPlayers()}
+        {renderGameBoard()}
+      </div>
+
+      {showModal && renderQuestionModal()}
+      {gameEnded && renderGameEnd()}
+    </div>
+  );
+}
+
+// Leaderboard Component
+function Leaderboard({ onBackToHome }) {
+  const [leaderboard, setLeaderboard] = useState([]);
+
+  useEffect(() => {
+    const savedLeaderboard = JSON.parse(localStorage.getItem('jeopardyLeaderboard') || '[]');
+    setLeaderboard(savedLeaderboard);
+  }, []);
+
+  const clearLeaderboard = () => {
+    if (window.confirm('Are you sure you want to clear the leaderboard? This action cannot be undone.')) {
+      localStorage.removeItem('jeopardyLeaderboard');
+      setLeaderboard([]);
     }
-`;
-document.head.appendChild(style); 
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+  };
+
+  const getDifficultyColor = (difficulty) => {
+    switch (difficulty) {
+      case 'easy': return '#28a745';
+      case 'medium': return '#ffc107';
+      case 'hard': return '#dc3545';
+      default: return '#6c757d';
+    }
+  };
+
+  if (leaderboard.length === 0) {
+    return (
+      <div className="container">
+        <div className="card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h1>🏆 Leaderboard</h1>
+            <button className="btn btn-secondary" onClick={onBackToHome}>
+              Back to Home
+            </button>
+          </div>
+          
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <h3>No games played yet!</h3>
+            <p style={{ color: '#666', marginTop: '10px' }}>
+              Play a game to see your scores here.
+            </p>
+            <button className="btn" onClick={onBackToHome} style={{ marginTop: '20px' }}>
+              Start Playing
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container">
+      <div className="card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h1>🏆 Leaderboard</h1>
+          <div>
+            <button className="btn btn-danger" onClick={clearLeaderboard} style={{ marginRight: '10px' }}>
+              Clear Leaderboard
+            </button>
+            <button className="btn btn-secondary" onClick={onBackToHome}>
+              Back to Home
+            </button>
+          </div>
+        </div>
+
+        <div className="leaderboard">
+          {leaderboard.map((game, gameIndex) => {
+            const winner = game.players.reduce((prev, current) => 
+              (prev.score > current.score) ? prev : current
+            );
+            
+            return (
+              <div key={gameIndex} style={{ marginBottom: '30px', border: '1px solid #e9ecef', borderRadius: '12px', padding: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                  <h3>Game #{gameIndex + 1}</h3>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '14px', color: '#666' }}>
+                      {formatDate(game.date)}
+                    </div>
+                    <div style={{ 
+                      display: 'inline-block', 
+                      padding: '4px 8px', 
+                      borderRadius: '4px', 
+                      fontSize: '12px', 
+                      fontWeight: 'bold',
+                      color: 'white',
+                      backgroundColor: getDifficultyColor(game.difficulty)
+                    }}>
+                      {game.difficulty.toUpperCase()}
+                    </div>
+                  </div>
+                </div>
+                
+                <div style={{ marginBottom: '15px' }}>
+                  <strong>Winner:</strong> {winner.name} (${winner.score})
+                </div>
+                
+                <div>
+                  <strong>Final Standings:</strong>
+                  {game.players
+                    .sort((a, b) => b.score - a.score)
+                    .map((player, playerIndex) => (
+                      <div key={playerIndex} className="leaderboard-item">
+                        <span className="leaderboard-rank">#{playerIndex + 1}</span>
+                        <span>{player.name}</span>
+                        <span className="leaderboard-score">${player.score}</span>
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Render the app
+ReactDOM.render(<App />, document.getElementById('app')); 
