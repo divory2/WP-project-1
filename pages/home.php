@@ -77,9 +77,9 @@ if (!$categories || !$difficulties) {
 
             <div class="form-actions">
                 <button type="submit" class="btn">Start Game</button>
-                <button type="submit" name="action" value="view_leaderboard" class="btn btn-secondary">
+                <a href="?page=leaderboard" class="btn btn-secondary">
                     View Leaderboard
-                </button>
+                </a>
             </div>
         </form>
     </div>
