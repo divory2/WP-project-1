@@ -1,23 +1,36 @@
 <?php
-if (!isset($_SESSION['game_data']) || !isset($_GET['index'])) {
-    header('Location: ?page=game');
+// Check if game data and settings exist
+if (!isset($_SESSION['game_data']) || !isset($_SESSION['game_settings']) || !isset($_GET['index'])) {
+    $_SESSION['error'] = 'Please start a new game first.';
+    header('Location: ?page=home');
     exit;
 }
 
 $questionIndex = (int)$_GET['index'];
 $gameData = $_SESSION['game_data'];
+$settings = $_SESSION['game_settings'];
+
+// Validate game data structure
+if (!isset($gameData['questions']) || !isset($gameData['players']) || !isset($gameData['current_player'])) {
+    $_SESSION['error'] = 'Game data is corrupted. Please start a new game.';
+    header('Location: ?page=home');
+    exit;
+}
+
 $questions = $gameData['questions'];
 
 if (!isset($questions[$questionIndex])) {
+    $_SESSION['error'] = 'Question not found.';
     header('Location: ?page=game');
     exit;
 }
 
 $question = $questions[$questionIndex];
-$settings = $_SESSION['game_settings'];
 
 // Check if question was already answered
-if (isset($gameData['answered_questions'][$questionIndex])) {
+$answeredQuestions = $gameData['answered_questions'] ?? [];
+if (isset($answeredQuestions[$questionIndex])) {
+    $_SESSION['error'] = 'This question has already been answered.';
     header('Location: ?page=game');
     exit;
 }
@@ -46,7 +59,7 @@ shuffle($answers);
             <h2>Question <?php echo $questionIndex + 1; ?></h2>
             <div class="question-info">
                 <span class="points"><?php echo getPointsForDifficulty($settings['difficulty']); ?> points</span>
-                <span class="current-player">Current: <?php echo htmlspecialchars($gameData['players'][$gameData['current_player']]['name']); ?></span>
+                <span class="current-player">Current: <?php echo htmlspecialchars($gameData['players'][$gameData['current_player']]['name'] ?? 'Unknown'); ?></span>
             </div>
         </div>
 

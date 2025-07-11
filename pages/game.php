@@ -1,16 +1,26 @@
 <?php
-if (!isset($_SESSION['game_data'])) {
+// Check if game data exists
+if (!isset($_SESSION['game_data']) || !isset($_SESSION['game_settings'])) {
+    $_SESSION['error'] = 'Please start a new game first.';
     header('Location: ?page=home');
     exit;
 }
 
 $gameData = $_SESSION['game_data'];
 $settings = $_SESSION['game_settings'];
+
+// Validate game data structure
+if (!isset($gameData['questions']) || !isset($gameData['players']) || !isset($gameData['current_player'])) {
+    $_SESSION['error'] = 'Game data is corrupted. Please start a new game.';
+    header('Location: ?page=home');
+    exit;
+}
+
 $questions = $gameData['questions'];
 $players = $gameData['players'];
 $currentPlayer = $gameData['current_player'];
-$answeredQuestions = $gameData['answered_questions'];
-$gameEnded = $gameData['game_ended'];
+$answeredQuestions = $gameData['answered_questions'] ?? [];
+$gameEnded = $gameData['game_ended'] ?? false;
 
 // Get category name
 $categories = getCategories();
@@ -27,7 +37,7 @@ if (isset($categories['trivia_categories'])) {
 
 <div class="container">
     <div class="game-header">
-        <h1>🎯 Jeopardy Game</h1>
+        <h1>🎯 Jeopardy Showdown</h1>
         <div class="game-info">
             <span><strong>Category:</strong> <?php echo htmlspecialchars($categoryName); ?></span>
             <span><strong>Difficulty:</strong> <?php echo htmlspecialchars(ucfirst($settings['difficulty'])); ?></span>
@@ -37,7 +47,7 @@ if (isset($categories['trivia_categories'])) {
     <?php if ($gameEnded): ?>
         <!-- Game End Screen -->
         <div class="card">
-            <h2 style="text-align: center; margin-bottom: 30px;">Game Over!</h2>
+            <h2>Game Over!</h2>
             
             <div class="final-scores">
                 <h3>Final Scores:</h3>
@@ -58,7 +68,7 @@ if (isset($categories['trivia_categories'])) {
                 <?php endforeach; ?>
             </div>
 
-            <form method="POST" action="" style="text-align: center; margin-top: 30px;">
+            <form method="POST" action="?page=game" class="form-actions">
                 <input type="hidden" name="action" value="end_game">
                 <button type="submit" class="btn">Save to Leaderboard & Return Home</button>
             </form>

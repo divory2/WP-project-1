@@ -14,9 +14,9 @@ if (isset($categories['trivia_categories'])) {
 <div class="container">
     <div class="card">
         <div class="leaderboard-header">
-            <h1 style="text-align: center; margin-bottom: 30px;">🏆 Leaderboard</h1>
+            <h1>🏆 Leaderboard</h1>
             
-            <form method="POST" action="" style="text-align: center; margin-bottom: 20px;">
+            <form method="POST" action="" class="form-actions">
                 <input type="hidden" name="action" value="clear_leaderboard">
                 <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to clear the leaderboard?')">
                     Clear Leaderboard
@@ -71,7 +71,7 @@ if (isset($categories['trivia_categories'])) {
             </div>
         <?php endif; ?>
 
-        <div style="text-align: center; margin-top: 30px;">
+        <div class="form-actions">
             <a href="?page=home" class="btn">Back to Home</a>
         </div>
     </div>

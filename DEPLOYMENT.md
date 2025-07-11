@@ -1,7 +1,7 @@
-# Plain PHP Jeopardy Game - Deployment Guide
+# Plain PHP Jeopardy Showdown - Deployment Guide
 
 ## Overview
-This is a **completely self-contained** Jeopardy game that works with just PHP and HTML. No database, no frameworks, no build tools required!
+This is a **completely self-contained** Jeopardy Showdown that works with just PHP and HTML. No database, no frameworks, no build tools required!
 
 ## What You Get
 - ✅ **4 files total** - That's it!

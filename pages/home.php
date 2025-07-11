@@ -3,9 +3,16 @@ $categories = getCategories();
 $difficulties = getDifficulties();
 
 $error = '';
+$success = '';
+
 if (isset($_SESSION['error'])) {
     $error = $_SESSION['error'];
     unset($_SESSION['error']);
+}
+
+if (isset($_SESSION['success'])) {
+    $success = $_SESSION['success'];
+    unset($_SESSION['success']);
 }
 
 // Check if API calls failed
@@ -16,12 +23,14 @@ if (!$categories || !$difficulties) {
 
 <div class="container">
     <div class="card">
-        <h1 style="text-align: center; margin-bottom: 30px; font-size: 2.5rem; color: #333;">
-            🎯 Jeopardy Game
-        </h1>
+        <h1>🎯 Jeopardy Showdown</h1>
 
         <?php if ($error): ?>
             <div class="error"><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
+
+        <?php if ($success): ?>
+            <div class="success"><?php echo htmlspecialchars($success); ?></div>
         <?php endif; ?>
 
         <form method="POST" action="">
@@ -62,14 +71,13 @@ if (!$categories || !$difficulties) {
                         class="form-control"
                         placeholder="Player <?php echo $i + 1; ?> Name"
                         required
-                        style="margin-bottom: 10px;"
                     >
                 <?php endfor; ?>
             </div>
 
-            <div style="text-align: center; margin-top: 30px;">
+            <div class="form-actions">
                 <button type="submit" class="btn">Start Game</button>
-                <button type="submit" name="action" value="view_leaderboard" class="btn btn-secondary" style="margin-left: 15px;">
+                <button type="submit" name="action" value="view_leaderboard" class="btn btn-secondary">
                     View Leaderboard
                 </button>
             </div>

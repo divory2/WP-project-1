@@ -1,6 +1,6 @@
-# 🎯 Jeopardy Game - Pure PHP Version
+# 🎯 Jeopardy Showdown - Pure PHP Version
 
-A server-side rendered Jeopardy game built with **PHP, HTML, and CSS only** - no JavaScript required!
+A server-side rendered Jeopardy Showdown built with **PHP, HTML, and CSS only** - no JavaScript required!
 
 ## Features
 
