@@ -1,45 +1,95 @@
-Laravel installation guide
-You can use NPM or Bun, Node to compiile application's frontend
+# 🎯 Jeopardy Showdown - Pure PHP Version
 
-install PHP, Composer on local machine
-MacOS:  /bin/bash -c "$(curl -fsSL https://php.new/install/mac/8.4)"
+A server-side rendered Jeopardy Showdown built with **PHP, HTML, and CSS only** - no JavaScript required!
 
-WindowsPowerShell:  # Run as administrator...
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://php.new/install/windows/8.4'))
+## Features
 
+- 🎮 **Pure PHP Game Logic** - All game mechanics handled server-side
+- 🎯 **Trivia Questions** - Powered by Open Trivia Database API
+- 👥 **Multi-Player Support** - Up to 3 players per game
+- 🏆 **Leaderboard System** - Track game history and scores
+- 📱 **Responsive Design** - Works on desktop and mobile
+- 🎨 **Modern UI** - Beautiful gradient design with smooth animations
+- 💾 **Session-Based Storage** - No database required
 
-Linux:  /bin/bash -c "$(curl -fsSL https://php.new/install/linux/8.4)"
+## How to Play
 
+1. **Setup Game**: Choose a category, difficulty, and enter player names
+2. **Take Turns**: Players take turns selecting and answering questions
+3. **Earn Points**: Correct answers earn points based on difficulty
+4. **Win**: Player with the most points at the end wins!
 
+## File Structure
 
-Restart Terminal 
+```
+├── index.php              # Main application file
+├── api.php                # API proxy for trivia questions
+├── style.css              # Styling and animations
+├── pages/                 # Page templates
+│   ├── home.php          # Game setup page
+│   ├── game.php          # Main game board
+│   ├── question.php      # Individual question display
+│   └── leaderboard.php   # Score history
+├── leaderboard.json      # Game history storage
+└── README.md             # This file
+```
 
-install Laravel installer via composer:
-    composer global require laravel/installer
+## Installation & Setup
 
+### Local Development
 
-Trivia API
-request body should include example:
-https://opentdb.com/api.php?amount=10&category=9&difficulty=medium&type=multiple
+1. **Start PHP Server**:
+   ```bash
+   php -S localhost:8000
+   ```
 
+2. **Open Browser**:
+   ```
+   http://localhost:8000
+   ```
 
-amount
-category
-difficulty
-type
+### Web Hosting Deployment
 
+1. **Upload Files**: Upload all files to your web hosting directory
+2. **Set Permissions**: Ensure `leaderboard.json` is writable
+3. **Access**: Navigate to your domain to start playing
 
-Category Id:    https://opentdb.com/api_category.php
+## Game Rules
 
+- **Easy Questions**: 100 points
+- **Medium Questions**: 200 points  
+- **Hard Questions**: 300 points
+- **Turn Order**: Players take turns clockwise
+- **Game End**: When all questions are answered
+- **Winner**: Player with highest score
 
-How to initialize curl:
-    curl_init()
+## Technical Details
 
-How to Execute Curl:
-curl_exec()
+- **Backend**: PHP 7.4+ with session management
+- **Frontend**: HTML5 + CSS3 (no JavaScript)
+- **API**: Open Trivia Database (via proxy)
+- **Storage**: JSON file for leaderboard
+- **Styling**: Custom CSS with gradients and animations
 
-Decode Json response:
-    json_decode()
+## API Integration
 
-close curl:
-curl_close()
+The game uses the Open Trivia Database API through a PHP proxy (`api.php`) to:
+- Fetch question categories
+- Get difficulty levels
+- Retrieve random questions
+
+## Browser Compatibility
+
+- ✅ Chrome/Chromium
+- ✅ Firefox
+- ✅ Safari
+- ✅ Edge
+- ✅ Mobile browsers
+
+## License
+
+This project is open source and available under the MIT License.
+
+---
+
+**Enjoy playing Jeopardy! 🎯** 
