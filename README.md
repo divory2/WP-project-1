@@ -1,122 +1,90 @@
-# Jeopardy Game - Plain PHP Version
+# 🎯 Jeopardy Game - Pure PHP Version
 
-A complete Jeopardy game built with **plain PHP and React** - no frameworks, no database required!
+A server-side rendered Jeopardy game built with **PHP, HTML, and CSS only** - no JavaScript required!
 
 ## Features
 
-- 🎯 **3-player Jeopardy game** with real trivia questions
-- 🏆 **Leaderboard** stored in browser localStorage
-- 📱 **Responsive design** that works on all devices
-- 🌐 **Real-time questions** from Open Trivia Database API
-- 🎨 **Modern UI** with smooth animations
-- 📊 **Score tracking** and player turns
-- 🏅 **Game history** with detailed results
+- 🎮 **Pure PHP Game Logic** - All game mechanics handled server-side
+- 🎯 **Trivia Questions** - Powered by Open Trivia Database API
+- 👥 **Multi-Player Support** - Up to 3 players per game
+- 🏆 **Leaderboard System** - Track game history and scores
+- 📱 **Responsive Design** - Works on desktop and mobile
+- 🎨 **Modern UI** - Beautiful gradient design with smooth animations
+- 💾 **Session-Based Storage** - No database required
 
-## How It Works
+## How to Play
 
-- **PHP API Proxy** (`api.php`) - Fetches questions from external API
-- **React Frontend** - Handles all game logic and UI
-- **Local Storage** - Stores leaderboard data in browser
-- **No Database** - Everything works without any server-side storage
+1. **Setup Game**: Choose a category, difficulty, and enter player names
+2. **Take Turns**: Players take turns selecting and answering questions
+3. **Earn Points**: Correct answers earn points based on difficulty
+4. **Win**: Player with the most points at the end wins!
 
-## Files
+## File Structure
 
 ```
-jeopardy-php/
-├── index.html          # Main HTML file
-├── style.css           # All styling
-├── app.js              # React application
-├── api.php             # PHP API proxy
-└── README.md           # This file
+├── index.php              # Main application file
+├── api.php                # API proxy for trivia questions
+├── style.css              # Styling and animations
+├── pages/                 # Page templates
+│   ├── home.php          # Game setup page
+│   ├── game.php          # Main game board
+│   ├── question.php      # Individual question display
+│   └── leaderboard.php   # Score history
+├── leaderboard.json      # Game history storage
+└── README.md             # This file
 ```
 
-## Quick Start
+## Installation & Setup
 
-1. **Upload to your PHP hosting:**
-   - Upload all files to your web root
-   - Make sure `index.html` is accessible
+### Local Development
 
-2. **That's it!** No database setup, no dependencies to install.
+1. **Start PHP Server**:
+   ```bash
+   php -S localhost:8000
+   ```
 
-## API Endpoints
+2. **Open Browser**:
+   ```
+   http://localhost:8000
+   ```
 
-The `api.php` file handles these endpoints:
+### Web Hosting Deployment
 
-- `GET api.php?endpoint=categories` - Get trivia categories
-- `GET api.php?endpoint=difficulties` - Get difficulty levels
-- `GET api.php?endpoint=questions&category=9&difficulty=easy&amount=15` - Get questions
-
-## Hosting Requirements
-
-### Required:
-- ✅ **PHP 7.4+** (for API proxy)
-- ✅ **Web server** (Apache, Nginx, etc.)
-- ✅ **Internet connection** (for external API calls)
-
-### Not Required:
-- ❌ **Database** (MySQL, PostgreSQL, etc.)
-- ❌ **Node.js** or build tools
-- ❌ **Composer** or PHP dependencies
-- ❌ **Special server software**
+1. **Upload Files**: Upload all files to your web hosting directory
+2. **Set Permissions**: Ensure `leaderboard.json` is writable
+3. **Access**: Navigate to your domain to start playing
 
 ## Game Rules
 
-1. **3 players** take turns answering questions
-2. **15 questions total** (5 per player)
-3. **Points based on difficulty:**
-   - Easy: 100 points
-   - Medium: 200 points
-   - Hard: 300 points
-4. **Correct answers** add points
-5. **Wrong answers** subtract points (minimum 0)
-6. **Winner** is the player with the highest score
+- **Easy Questions**: 100 points
+- **Medium Questions**: 200 points  
+- **Hard Questions**: 300 points
+- **Turn Order**: Players take turns clockwise
+- **Game End**: When all questions are answered
+- **Winner**: Player with highest score
 
-## Leaderboard
+## Technical Details
 
-- **Stored in browser** localStorage
-- **Top 10 games** are kept
-- **Per-browser** (not shared between devices)
-- **Includes** date, difficulty, category, and final standings
+- **Backend**: PHP 7.4+ with session management
+- **Frontend**: HTML5 + CSS3 (no JavaScript)
+- **API**: Open Trivia Database (via proxy)
+- **Storage**: JSON file for leaderboard
+- **Styling**: Custom CSS with gradients and animations
 
-## Customization
+## API Integration
 
-### Styling
-Edit `style.css` to change colors, fonts, and layout.
+The game uses the Open Trivia Database API through a PHP proxy (`api.php`) to:
+- Fetch question categories
+- Get difficulty levels
+- Retrieve random questions
 
-### Game Settings
-Modify `app.js` to change:
-- Number of questions
-- Point values
-- Game board layout
+## Browser Compatibility
 
-### API
-Update `api.php` to:
-- Add new endpoints
-- Change external API
-- Add caching
-
-## Troubleshooting
-
-### Questions Not Loading
-- Check if your hosting allows external API calls
-- Verify `api.php` is accessible
-- Check browser console for errors
-
-### Styling Issues
-- Ensure `style.css` is in the same directory as `index.html`
-- Check if your hosting supports CSS files
-
-### Game Not Working
-- Make sure all files are uploaded
-- Check browser console for JavaScript errors
-- Verify React and Axios are loading from CDN
-
-## Browser Support
-
-- ✅ **Chrome** 60+
-- ✅ **Firefox** 55+
-- ✅ **Safari** 12+
-- ✅ **Edge** 79+
+- ✅ Chrome/Chromium
+- ✅ Firefox
+- ✅ Safari
+- ✅ Edge
+- ✅ Mobile browsers
 
 ## License
 
@@ -124,4 +92,4 @@ This project is open source and available under the MIT License.
 
 ---
 
-**Perfect for shared hosting, VPS, or any PHP hosting service!** 
+**Enjoy playing Jeopardy! 🎯** 
