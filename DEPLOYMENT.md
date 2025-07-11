@@ -5,7 +5,6 @@ This is a **completely self-contained** Jeopardy game that works with just PHP a
 
 ## What You Get
 - ✅ **4 files total** - That's it!
-- ✅ **No database** - Uses browser localStorage
 - ✅ **No dependencies** - Everything included via CDN
 - ✅ **Works anywhere** - Any PHP hosting service
 
@@ -54,7 +53,6 @@ jeopardy-php/
 2. **React app starts** → Loads from CDN
 3. **Game setup** → Calls `api.php` for categories/difficulties
 4. **Game starts** → Calls `api.php` for questions
-5. **Leaderboard** → Stored in browser localStorage
 
 ### API Calls:
 - `api.php?endpoint=categories` → Gets trivia categories
@@ -142,7 +140,6 @@ chmod 644 api.php
 
 ## Security Notes
 
-- The game uses **localStorage** for data (client-side only)
 - **No sensitive data** is stored on the server
 - **No user accounts** or authentication required
 - **No database** means no SQL injection risks
