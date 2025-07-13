@@ -33,7 +33,7 @@ if (!$categories || !$difficulties) {
             <div class="success"><?php echo htmlspecialchars($success); ?></div>
         <?php endif; ?>
 
-        <form class="bounce-form" method="POST" action="">
+        <form class="bounce-form" method="POST" action="index.php">
             <input type="hidden" name="action" value="start_game">
             
             <div class="form-group">
@@ -63,17 +63,22 @@ if (!$categories || !$difficulties) {
             </div>
 
             <div class="form-group">
-                <label>Player Names (3 players):</label>
-                <?php for ($i = 0; $i < 3; $i++): ?>
-                    <input
-                        type="text"
-                        name="player_names[]"
-                        class="form-control"
-                        placeholder="Player <?php echo $i + 1; ?> Name"
-                        required
-                    >
-                <?php endfor; ?>
-            </div>
+                   
+                    <?php for ($i = 0; $i < 3; $i++): ?>
+                        <label for="player_<?php echo $i; ?>" class="sr-only">
+                            Player <?php echo $i + 1; ?> Name
+                        </label>
+                        <input
+                            type="text"
+                            id="player_<?php echo $i; ?>"
+                            name="player_names[]"
+                            class="form-control"
+                            placeholder="Player <?php echo $i + 1; ?> Name"
+                            required
+                        >
+                    <?php endfor; ?>
+                </div>
+
 
             <div class="form-actions">
                 <button type="submit" class="btn">Start Game</button>
