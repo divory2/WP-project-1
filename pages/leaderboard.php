@@ -27,7 +27,11 @@ if (isset($categories['trivia_categories'])) {
         <?php if (empty($leaderboard)): ?>
             <div class="empty-leaderboard">
                 <p>No games played yet. Start a game to see scores here!</p>
-                <a href="?page=home" class="btn">Start New Game</a>
+                <form method="POST" action="index.php">
+                    <input type="hidden" name="action" value="start_new_game">
+                    <button type="submit" class="btn">Start New Game</button>
+                </form>
+
             </div>
         <?php else: ?>
             <div class="leaderboard-entries">
