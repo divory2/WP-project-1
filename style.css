@@ -741,6 +741,18 @@ select.form-control {
         transform: translateY(0) scale(1);
     }
 }
+.bounce-form{
+    animation: bounce 2s infinite;
+
+}
+@keyframes bounce {
+    0%, 100% {
+      transform: translateY(0); /* Starting and ending position (at the top) */
+    }
+    50% {
+      transform: translateY(20px); /* Bounced down position (adjust for desired bounce height) */
+    }
+}
 
 .question-cell {
     animation: fadeInScale 0.6s cubic-bezier(0.4, 0, 0.2, 1);

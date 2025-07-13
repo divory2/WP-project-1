@@ -33,7 +33,7 @@ if (!$categories || !$difficulties) {
             <div class="success"><?php echo htmlspecialchars($success); ?></div>
         <?php endif; ?>
 
-        <form method="POST" action="">
+        <form class="bounce-form" method="POST" action="">
             <input type="hidden" name="action" value="start_game">
             
             <div class="form-group">
