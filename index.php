@@ -4,6 +4,8 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
 
+
+
 // Initialize session variables if not set
 if (!isset($_SESSION['current_page'])) {
     $_SESSION['current_page'] = 'home';
@@ -14,6 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         switch ($_POST['action']) {
             case 'start_game':
+                 unset($_SESSION['game_data']);
+                 unset($_SESSION['game_settings']);
                 $_SESSION['game_settings'] = [
                     'category' => $_POST['category'],
                     'difficulty' => $_POST['difficulty'],
@@ -41,6 +45,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'clear_leaderboard':
                 clearLeaderboard();
                 break;
+            case 'start_new_game':
+                    unset($_SESSION['game_data']);
+                    unset($_SESSION['game_settings']);
+                    $_SESSION['current_page'] = 'home';
+                    break;
+                
         }
     }
 }
@@ -66,6 +76,7 @@ function handleAnswerSubmission() {
     // Check if answer is correct
     $question = $_SESSION['game_data']['questions'][$questionIndex];
     $isCorrect = ($selectedAnswer === $question['correct_answer']);
+    
     
     // Update player score
     if ($isCorrect && isset($_SESSION['game_data']['players'][$currentPlayer])) {
@@ -176,33 +187,39 @@ function getQuestions($category, $difficulty) {
 }
 
 // Initialize game data if starting new game
-if ($_SESSION['current_page'] === 'game' && !isset($_SESSION['game_data'])) {
-    // Check if game settings exist
-    if (!isset($_SESSION['game_settings']) || !isset($_SESSION['game_settings']['player_names'])) {
-        // Redirect to home if no game settings
-        $_SESSION['current_page'] = 'home';
-        $_SESSION['error'] = 'Please start a new game first.';
-    } else {
-        $settings = $_SESSION['game_settings'];
-        $questionsData = getQuestions($settings['category'], $settings['difficulty']);
+
+
+if ($_SESSION['current_page'] === 'game') {
+    // Always check if we need to (re)initialize the game
+    if (!isset($_SESSION['game_data']) 
+        || empty($_SESSION['game_data']['questions'])) {
         
-        if (isset($questionsData['results'])) {
-            $_SESSION['game_data'] = [
-                'questions' => $questionsData['results'],
-                'current_player' => 0,
-                'players' => array_map(function($name) {
-                    return ['name' => $name, 'score' => 0];
-                }, $settings['player_names']),
-                'answered_questions' => [],
-                'game_ended' => false
-            ];
+        if (isset($_SESSION['game_settings']) && !empty($_SESSION['game_settings']['player_names'])) {
+            $settings = $_SESSION['game_settings'];
+            $questionsData = getQuestions($settings['category'], $settings['difficulty']);
+            
+            if (isset($questionsData['results']) && count($questionsData['results']) > 0) {
+                $_SESSION['game_data'] = [
+                    'questions' => $questionsData['results'],
+                    'current_player' => 0,
+                    'players' => array_map(function($name) {
+                        return ['name' => $name, 'score' => 0];
+                    }, $settings['player_names']),
+                    'answered_questions' => [],
+                    'game_ended' => false
+                ];
+            } else {
+                $_SESSION['current_page'] = 'home';
+                $_SESSION['error'] = 'Unable to load questions. Please try again.';
+            }
         } else {
-            // Handle API error
             $_SESSION['current_page'] = 'home';
-            $_SESSION['error'] = 'Unable to load questions. Please try again.';
+            $_SESSION['error'] = 'Missing game settings. Please start a new game.';
         }
     }
 }
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
